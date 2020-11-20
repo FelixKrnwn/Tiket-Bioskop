@@ -1,6 +1,6 @@
 from json import load
 
-file_path = "filetxt/tickets.json"
+file_path = "newtxt/tickets.json"
 mode = "r"
 
 with open(file_path, mode) as file:

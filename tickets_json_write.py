@@ -1,17 +1,19 @@
 from json import dump
 
-file_path = "filetxt/tickets.json"
+file_path = "newtxt/ticket.json"
 mode = "w"
 
 tickets = {
 	"133029-F001A5" : {
-		"judul" : "Anabelle\n",
-		"jam" : "13 45\n",
-		"tanggal" : "29 Oktober 2020\n",
-		"studio" : "5\n",
-		"kursi" : "F15\n"
+		"customer" : "Felix",
+		"judul" : "Anabelle",
+		"jam" : "13 45",
+		"tanggal" : "29 Oktober 2020",
+		"studio" : "5",
+		"kursi" : "F15"
 	},
 	"20301-A002S2" : {
+		"customer" : "Dodo",
 		"judul" : "Spriderman, Far From Home",
 		"jam" : "20 45",
 		"tanggal" : "1 November 2020",

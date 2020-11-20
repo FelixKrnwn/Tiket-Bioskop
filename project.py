@@ -31,9 +31,10 @@ def verify_ans(char):
 	else:
 		return False
 
-def print_data(id_pesanan=None, judul=True, jam=True, tanggal=True, studio=True, kursi=True,all_data=False):
+def print_data(id_pesanan=None, customer=True, judul=True, jam=True, tanggal=True, studio=True, kursi=True,all_data=False):
 	if id_pesanan != None and all_data == False:
 		print(f"NOMOR TIKET : {id_pesanan}")
+		print(f"NAMA CUSTOMER : {tickets[id_pesanan]['customer']}")
 		print(f"JUDUL : {tickets[id_pesanan]['judul']}")
 		print(f"JAM : {tickets[id_pesanan]['jam']}")
 		print(f"TANGGAL : {tickets[id_pesanan]['tanggal']}")
@@ -41,19 +42,20 @@ def print_data(id_pesanan=None, judul=True, jam=True, tanggal=True, studio=True,
 		print(f"KURSI : {tickets[id_pesanan]['kursi']}")
 	elif kursi == False and all_data == False:
 		print(f"NOMOR TIKET : {id_pesanan}")
+		print(f"NAMA CUSTOMER : {tickets[id_pesanan]['customer']}")
 		print(f"JUDUL : {tickets[id_pesanan]['judul']}")
 		print(f"JAM : {tickets[id_pesanan]['jam']}")
 		print(f"TANGGAL : {tickets[id_pesanan]['tanggal']}")
 		print(f"STUDIO : {tickets[id_pesanan]['studio']}")
-		print(f"KURSI : {tickets[id_pesanan]['kursi']}")
 	elif all_data == True:
 		for id_pesanan in tickets:
+			customer = tickets[id_pesanan]["customer"]
 			judul = tickets[id_pesanan]["judul"]
 			jam = tickets[id_pesanan]["jam"]
 			tanggal = tickets[id_pesanan]["tanggal"]
 			studio = tickets[id_pesanan]["studio"]
 			kursi = tickets[id_pesanan]["kursi"]
-			print(f"NOMOR PESANAN : {id_pesanan} - JUDUL : {judul} - JAM : {jam} - TANGGAL : {tanggal} - STUDIO : {studio} - NOMOR KURSI : {kursi}")
+			print(f"NOMOR PESANAN : {id_pesanan} - NAMA CUSTOMER : {customer} - JUDUL : {judul} - JAM : {jam} - TANGGAL : {tanggal} - STUDIO : {studio} - NOMOR KURSI : {kursi}")
 
 def view_tickets():
 	print_header("DAFTAR TIKET TERSIMPAN")
@@ -63,7 +65,8 @@ def view_tickets():
 		print("MAAF BELUM ADA TIKET TERSIMPAN")
 	input("Tekan ENTER untuk kembali ke MENU")
 
-def create_id_pesanan(judul, jam, tanggal, studio, kursi):
+def create_id_pesanan(customer, judul, jam, tanggal, studio, kursi):
+	nama = customer[0]
 	hari = datetime.now()
 	jam = hari.hour
 	tanggal = hari.day
@@ -73,21 +76,23 @@ def create_id_pesanan(judul, jam, tanggal, studio, kursi):
 	first = judul[0].upper()
 	last_1 = kursi[0]
 	
-	id_pesanan = ("%04d%02d-%s%03d%s%s" % (jam, tanggal, last_1, counter, first, cinema))
+	id_pesanan = ("%s%04d%02d-%s%03d%s%s" % (nama, jam, tanggal, last_1, counter, first, cinema))
 	return id_pesanan
 
 
 def add_ticket():
 	print_header("MENAMBAHKAN TIKET BARU")
+	customer = input("NAMA CUSTOMER \t: ")
 	judul = input("JUDUL \t: ")
 	jam = input("JAM \t: ")
 	tanggal = input("TANGGAL \t: ")
 	studio = input("STUDIO \t: ")
 	kursi = input("NOMOR KURSI \t: ")
-	respon = input(f"Apakah yakin ingin membuat tiket : {judul} ? (Y/N) ")
+	respon = input(f"Apakah yakin ingin membuat tiket : {customer} ? (Y/N) ")
 	if verify_ans(respon):
-		id_pesanan = create_id_pesanan(judul=judul, jam=jam, tanggal=tanggal, studio=studio, kursi=kursi)
+		id_pesanan = create_id_pesanan(customer=customer, judul=judul, jam=jam, tanggal=tanggal, studio=studio, kursi=kursi)
 		tickets[id_pesanan] = {
+			"customer" : customer,
 			"judul" : judul,
 			"jam" : jam,
 			"tanggal" : tanggal,
@@ -103,14 +108,18 @@ def add_ticket():
 		print("TIKET Batal Dibuat")
 	input("Tekan ENTER untuk kembali ke MENU")
 
-def searching_by_id(ticket):
-	if ticket in tickets:
-		print('id_pesanan')
+def searching_by_name(ticket):
+	for id_pesanan in tickets:
+		if tickets[id_pesanan]['customer'] == ticket:
+			return id_pesanan
+	else:
+		return False
+
 
 def find_ticket():
 	print_header("MENCARI TIKET")
-	nopes = input(" Nomor tiket yang Dicari : ")
-	exists = searching_by_id(nopes)
+	customer = input(" Nama Customer tiket yang Dicari : ")
+	exists = searching_by_name(customer)
 	if exists:
 		print("Tiket Ditemukan")
 		print_data(id_pesanan=exists)
@@ -120,13 +129,13 @@ def find_ticket():
 
 def delete_ticket():
 	print_header("MENGHAPUS TIKET")
-	nopes = input(" Nomor tiket yang akan Dihapus : ")
-	exists = searching_by_id(nopes)
+	customer = input(" Nama Customer yang akan Dihapus : ")
+	exists = searching_by_name(customer)
 	if exists:
-		print_data(contact=exists)
-		respon = input(f"Yakin ingin menghapus {id_pesanan} ? (Y/N) ")
+		print_data(id_pesanan=exists)
+		respon = input(f"Yakin ingin menghapus {customer} ? (Y/N) ")
 		if verify_ans(respon):
-			del tickets[id_pesanan]
+			del tickets[exists]
 			saved = save_data_tickets()
 			if saved:
 				print("Tiket Telah Dihapus")
@@ -138,89 +147,98 @@ def delete_ticket():
 		print("Tiket Tidak Ada")
 	input("Tekan ENTER untuk kembali ke MENU")
 
-def update_ticket_judul(ticket):
-	print(f"Judul Lama : {ticket}")
+def update_ticket_customer(id_pesanan):
+	print(f"Nama Lama : {[tickets][id_contact]['customer']}")
+	new_name = input("Masukkan Nama baru : ")
+	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
+	result = verify_ans(respon)
+	if result :
+		tickets[id_pesanan]['customer'] = new_name
+		print("Data Telah di simpan")
+		print_data(id_pesanan)
+	else:
+		print("Data Batal diubah")
+
+def update_ticket_judul(id_pesanan):
+	print(f"Judul Lama : {tickets[id_pesanan]['judul']}")
 	new_title = input("Masukkan Judul baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
 	if result :
-		tickets[new_title] = tickets[ticket]
-		del tickets[ticket]
+		tickets[id_pesanan]['judul'] = new_title
 		print("Data Telah di simpan")
-		print_data(new_title)
+		print_data(id_pesanan)
 	else:
 		print("Data Batal diubah")
 
-def update_ticket_jam(ticket):
-	print(f"Jam nonton Lama : {ticket}")
+def update_ticket_jam(id_pesanan):
+	print(f"Jam nonton Lama : {tickets[id_pesanan]['jam']}")
 	new_hour = input("Masukkan Jam nonton baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
 	if result :
-		tickets[new_hour] = tickets[ticket]
-		del tickets[ticket]
+		tickets[id_pesanan]['jam'] = new_hour
 		print("Data Telah di simpan")
-		print_data(new_hour)
+		print_data(id_pesanan)
 	else:
 		print("Data Batal diubah")
 
-def update_ticket_tanggal(contact):
-	print(f"Tanggal Lama : {ticket}")
+def update_ticket_tanggal(id_pesanan):
+	print(f"Tanggal Lama : {ticket[id_pesanan]['tanggal']}")
 	new_date = input("Masukkan Tanggal baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
 	if result :
-		tickets[new_date] = tickets[ticket]
-		del tickets[ticket]
+		tickets[id_pesanan]['tanggal'] = new_date
 		print("Data Telah di simpan")
-		print_data(new_date)
+		print_data(id_pesanan)
 	else:
 		print("Data Batal diubah")
 
-def update_ticket_studio(contact):
-	print(f"Studio Lama : {ticket}")
+def update_ticket_studio(id_pesanan):
+	print(f"Studio Lama : {ticket[id_pesanan]['studio']}")
 	new_studio = input("Masukkan Studio baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
 	if result :
-		tickets[new_studio] = tickets[ticket]
-		del tickets[ticket]
+		tickets[id_pesanan]['studio'] = new_studio
 		print("Data Telah di simpan")
-		print_data(new_studio)
+		print_data(id_pesanan)
 	else:
 		print("Data Batal diubah")
 
-def update_ticket_nomor(contact):
-	print(f"Nomor Kursi Lama : {ticket}")
+def update_ticket_nomor(id_pesanan):
+	print(f"Nomor Kursi Lama : {tickets[id_pesanan]['kursi']}")
 	new_chair = input("Masukkan Nomor Kursi baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
 	if result :
-		tickets[new_chair] = tickets[ticket]
-		del tickets[ticket]
+		tickets[id_pesanan]['kursi'] = new_chair
 		print("Data Telah di simpan")
-		print_data(new_chair)
+		print_data(id_pesanan)
 	else:
 		print("Data Batal diubah")
 
 def update_ticket():
 	print_header("MENGUPDATE INFO TIKET")
-	nopes = input("Nomor Tiket yang akan di-update : ")
-	exists = searching_by_id(nopes)
+	customer = input("Nama Customer yang akan di-update : ")
+	exists = searching_by_name(customer)
 	if exists:
-		print_data(id_pesanan)
-		print("EDIT FIELD [1] JUDUL - [2] JAM - [3] TANGGAL - [4] STUDIO - [5] NOMOR KURSI")
-		respon = input("MASUKAN PILIHAN (1/2/3) : ")
+		print_data(exists)
+		print("EDIT FIELD [1] NAMA CUSTOMER [2] JUDUL - [3] JAM - [4] TANGGAL - [6] STUDIO - [6] NOMOR KURSI")
+		respon = input("MASUKAN PILIHAN (1/2/3/4/5) : ")
 		if respon == "1":
-			update_ticket_judul(nopes)
-		elif respon == "2":
-			update_ticket_jam(nopes)
+			update_ticket_customer(exists)
+		if respon == "2":
+			update_ticket_judul(exists)
 		elif respon == "3":
-			update_ticket_tanggal(nopes)
+			update_ticket_jam(exists)
 		elif respon == "4":
-			update_ticket_studio(nopes)
+			update_ticket_tanggal(exists)
 		elif respon == "5":
-			update_ticket_nomor(nopes)
+			update_ticket_studio(exists)
+		elif respon == "6":
+			update_ticket_nomor(exists)
 		saved = save_data_tickets()
 		if saved:
 			print("Data Tiket Telah di-update.")
@@ -232,12 +250,13 @@ def update_ticket():
 	input("Tekan ENTER untuk kembali ke MENU")
 
 def about_application():
+	system("cls")
 	print_header("TENTANG APLIKASI")
-	print('''APLIKASI TIKETING BIOSKOP SEDERHANA
+	print("""APLIKASI TIKETING BIOSKOP SEDERHANA
 		DIBUAT OLEH : Felix Kurniawan
-		TANGGAL PEMBUATAN : 28 Oktober 2020
-		DISELESAIKAN PADA : 1 November 2020
-		''')
+		TANGGAL PEMBUATAN : 19 November 2020
+		""")
+	return True
 
 
 def check_user_input(char):
@@ -257,6 +276,7 @@ def check_user_input(char):
 		update_ticket()
 	elif char == "6":
 		about_application()
+		return True
 
 def load_data_tickets():
 	with open(file_path, 'r') as file:
@@ -271,7 +291,7 @@ def save_data_tickets():
 
 #flag/sign/tanda menyimpan sebuah kondisi
 stop = False
-file_path = "filetxt/tickets.json"
+file_path = "newtxt/tickets.json"
 tickets = load_data_tickets()
 while not stop:
 	print_menu()
