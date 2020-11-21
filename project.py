@@ -148,7 +148,7 @@ def delete_ticket():
 	input("Tekan ENTER untuk kembali ke MENU")
 
 def update_ticket_customer(id_pesanan):
-	print(f"Nama Lama : {[tickets][id_contact]['customer']}")
+	print(f"Nama Lama : {tickets[id_pesanan]['customer']}")
 	new_name = input("Masukkan Nama baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
@@ -184,7 +184,7 @@ def update_ticket_jam(id_pesanan):
 		print("Data Batal diubah")
 
 def update_ticket_tanggal(id_pesanan):
-	print(f"Tanggal Lama : {ticket[id_pesanan]['tanggal']}")
+	print(f"Tanggal Lama : {tickets[id_pesanan]['tanggal']}")
 	new_date = input("Masukkan Tanggal baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
@@ -196,7 +196,7 @@ def update_ticket_tanggal(id_pesanan):
 		print("Data Batal diubah")
 
 def update_ticket_studio(id_pesanan):
-	print(f"Studio Lama : {ticket[id_pesanan]['studio']}")
+	print(f"Studio Lama : {tickets[id_pesanan]['studio']}")
 	new_studio = input("Masukkan Studio baru : ")
 	respon = input("Apakah yakin data ingin diubah (Y/N) : ")
 	result = verify_ans(respon)
@@ -225,7 +225,7 @@ def update_ticket():
 	exists = searching_by_name(customer)
 	if exists:
 		print_data(exists)
-		print("EDIT FIELD [1] NAMA CUSTOMER [2] JUDUL - [3] JAM - [4] TANGGAL - [6] STUDIO - [6] NOMOR KURSI")
+		print("EDIT FIELD [1] NAMA CUSTOMER [2] JUDUL - [3] JAM - [4] TANGGAL - [5] STUDIO - [6] NOMOR KURSI")
 		respon = input("MASUKAN PILIHAN (1/2/3/4/5) : ")
 		if respon == "1":
 			update_ticket_customer(exists)
@@ -277,6 +277,8 @@ def check_user_input(char):
 	elif char == "6":
 		about_application()
 		return True
+		while True:
+			input("Tekan ENTER untuk kembali ke MENU")
 
 def load_data_tickets():
 	with open(file_path, 'r') as file:
